@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ultrasonic-ndt-lab"
+version = "0.1.0"
+description = "Reproducible ultrasonic NDT imaging algorithms"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "matplotlib>=3.8",
+    "numpy>=1.26",
+    "scipy>=1.11",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
