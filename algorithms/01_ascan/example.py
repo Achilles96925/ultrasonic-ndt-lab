@@ -4,8 +4,7 @@ from pathlib import Path
 import sys
 
 import matplotlib.pyplot as plt
-from matplotlib.markers import MarkerStyle
-from matplotlib.widgets import Button, CheckButtons, RangeSlider, Slider
+from matplotlib.widgets import Button, RangeSlider, Slider
 import numpy as np
 
 plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "Noto Sans CJK SC", "DejaVu Sans"]
@@ -18,6 +17,7 @@ from ultrasonic_ndt.processing.gate import find_gate_peak
 from ultrasonic_ndt.processing.pipeline import process_ascan
 from ultrasonic_ndt.processing.tgc import TgcCurve
 from ultrasonic_ndt.simulation.ascan import simulate_ascan
+from ultrasonic_ndt.widgets import checkbox_markers, make_circular_checkbox
 
 
 class MovableRangeSlider(RangeSlider):
@@ -208,26 +208,12 @@ class AScanWorkbench:
         self.filter_slider.on_changed(self._on_filter_changed)
 
         checkbox_axis = self.figure.add_axes(self.LAYOUT["envelope_toggle"])
-        self.envelope_checkbox = CheckButtons(
-            checkbox_axis,
-            ["显示包络"],
-            [True],
-            frame_props={"edgecolor": "#1565C0", "linewidth": 1.2},
-            check_props={"color": "#1565C0"},
-        )
-        # CheckButtons hardcodes square/x markers and renamed this collection in Matplotlib 3.11.
-        circle_marker = MarkerStyle("o")
-        circle_path = circle_marker.get_path().transformed(circle_marker.get_transform())
-        self.envelope_checkbox._frames.set_paths([circle_path])
-        check_markers = (
-            self.envelope_checkbox._buttons
-            if hasattr(self.envelope_checkbox, "_buttons")
-            else self.envelope_checkbox._checks
-        )
-        check_markers.set_paths([circle_path])
-        check_markers.set_sizes(self.envelope_checkbox._frames.get_sizes() * 0.26)
+        self.envelope_checkbox = make_circular_checkbox(checkbox_axis, ["显示包络"], [True])
+
+        # 参数面板里把勾选框和文字重新定位到统一位置
+        markers = checkbox_markers(self.envelope_checkbox)
         self.envelope_checkbox._frames.set_offsets([self.LAYOUT["envelope_marker"]])
-        check_markers.set_offsets([self.LAYOUT["envelope_marker"]])
+        markers.set_offsets([self.LAYOUT["envelope_marker"]])
         for label in self.envelope_checkbox.labels:
             label.set_fontsize(11)
             label.set_position(self.LAYOUT["envelope_label"])
